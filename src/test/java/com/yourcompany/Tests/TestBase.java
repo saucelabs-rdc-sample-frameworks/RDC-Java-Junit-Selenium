@@ -23,14 +23,12 @@ import com.saucelabs.common.SauceOnDemandSessionIdProvider;
 /**
  * Demonstrates how to write a JUnit test that runs tests against Sauce Labs using multiple browsers in parallel.
  * <p/>
- * The test also includes the {@link SauceOnDemandTestWatcher} which will invoke the Sauce REST API to mark
- * the test as passed or failed.
  *
- * @author Neil Manvar
+ * @author Leo Laskin
  */
 @Ignore
 @RunWith(ConcurrentParameterized.class)
-public class TestBase implements SauceOnDemandSessionIdProvider {
+public class TestBase {
 
     public static String seleniumURI;
 
