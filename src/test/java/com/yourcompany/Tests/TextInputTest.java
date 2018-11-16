@@ -29,14 +29,4 @@ public class TextInputTest extends TestBase {
 
         assertThat(page.getSubmittedCommentText(), containsString(commentInputText));
     }
-    @Test
-    public void verifyCommentInputTest2() throws InvalidElementStateException {
-        String commentInputText = UUID.randomUUID().toString();
-
-        GuineaPigPage page = GuineaPigPage.visitPage(driver);
-        page.visitPage();
-        page.submitComment(commentInputText);
-
-        assertThat(page.getSubmittedCommentText(), containsString(commentInputText));
-    }
 }

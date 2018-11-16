@@ -1,37 +1,28 @@
 package com.yourcompany.Tests;
 
-import com.saucelabs.common.SauceOnDemandAuthentication;
-
 import org.junit.*;
 import org.junit.rules.TestName;
+import org.junit.runner.Description;
 import org.junit.runner.RunWith;
+import org.junit.rules.*;
+
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
+import com.yourcompany.util.*;
 import com.saucelabs.junit.ConcurrentParameterized;
-import com.saucelabs.junit.SauceOnDemandTestWatcher;
 
 import java.net.URL;
 import java.util.LinkedList;
 
-import com.saucelabs.common.SauceOnDemandSessionIdProvider;
 
-
-
-/**
- * Demonstrates how to write a JUnit test that runs tests against Sauce Labs using multiple browsers in parallel.
- * <p/>
- *
- * @author Leo Laskin
- */
 @Ignore
 @RunWith(ConcurrentParameterized.class)
 public class TestBase {
 
     public static String seleniumURI;
-
+    
     @Rule
     public TestName name = new TestName() {
         public String getMethodName() {
@@ -44,11 +35,11 @@ public class TestBase {
     protected String deviceName;
     protected WebDriver driver;
     protected String sessionId;
-
+    private ResultReporter reporter;
 
     /**
      * Constructs a new instance of the test.  The constructor requires three string parameters, which represent the operating
-     * system, version and browser to be used when launching a Sauce VM.  The order of the parameters should be the same
+     * system, version and browser to be used when launching a Sauce Device.  The order of the parameters should be the same
      * as that of the elements within the {@link #browsersStrings()} method.
      * @param platformName
      * @param platformVersion
@@ -70,8 +61,11 @@ public class TestBase {
     public static LinkedList browsersStrings() {
         LinkedList browsers = new LinkedList();
 
-        browsers.add(new String[]{"Android", "7.0", ""});
-        browsers.add(new String[]{"iOS", "12.0.1", ""});
+        // Dynamic Allocation
+        browsers.add(new String[]{"Android", "8.0", ""});
+        browsers.add(new String[]{"iOS", "12.1", ""});
+        
+        //Static Allocation
         browsers.add(new String[]{"Android", "", "Google_Pixel_2_real"});
         browsers.add(new String[]{"iOS", "", "iPad_2_16GB_real"});
 		
@@ -104,15 +98,31 @@ public class TestBase {
         this.sessionId = (((RemoteWebDriver) driver).getSessionId()).toString();
     }
 
-    @After
-    public void tearDown() throws Exception {
-        driver.quit();
-    }
+    // Reports Pass/Fail status and ends the session
+    @Rule
+    public TestWatcher watchman= new TestWatcher() {
+        @Override
+        protected void failed(Throwable e, Description description) {
+        	reporter = new ResultReporter();
+            String sessionId = getSessionId();
+
+            reporter.saveTestStatus(sessionId, false);
+            driver.quit();
+        }
+
+        @Override
+        protected void succeeded(Description description) {
+        	reporter = new ResultReporter();
+        	String sessionId = getSessionId();
+
+            reporter.saveTestStatus(sessionId, true);
+            driver.quit();
+           }
+       };
 
     /**
      * @return the value of the Sauce Job id.
      */
-    @Override
     public String getSessionId() {
         return sessionId;
     }
@@ -121,7 +131,6 @@ public class TestBase {
     public static void setupClass() {
         //get the uri to send the commands to.
         seleniumURI = "us1.appium.testobject.com:443";
-        //If available add build tag. When running under Jenkins BUILD_TAG is automatically set.
         //You can set this manually on manual runs.
         }
     }

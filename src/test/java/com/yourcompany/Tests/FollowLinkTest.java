@@ -24,12 +24,4 @@ public class FollowLinkTest extends TestBase {
 
         assertFalse(page.isOnPage());
     }
-    @Test
-    public void verifyLinkTest2() throws InvalidElementStateException {
-        GuineaPigPage page = GuineaPigPage.visitPage(driver);
-
-        page.followLink();
-
-        assertFalse(page.isOnPage());
-    }
 }
